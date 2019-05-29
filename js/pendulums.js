@@ -54,7 +54,7 @@ APP.init = function() {
     // Make balls:
     this.sphere = new THREE.SphereGeometry(0.01, 32, 32);
     this.sphere_material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    this.line_material = new THREE.LineBasicMaterial({color: 0x00ff00 });
+    this.line_material = new THREE.LineBasicMaterial({color: 0x009900 });
 
     var depth = 0;
     for (const length of this.lengths) {
@@ -98,27 +98,35 @@ APP.make_ball = function(l, z){
     this.balls.push({
         mesh: mesh,
         length: l,
-        period: calc_period(l)
+        period: calc_period(l),
+        vel: 0,
+        thet: this.amp * 0.0174533,
+        amp: this.amp
     });
     this.scene.add(mesh);
-    console.log(mesh);
 }.bind(APP);
 
 APP.tick = function() {
     window.requestAnimationFrame(this.tick);
     var now = Date.now();
     var delta = now - this.lastUpdate;
-    //this.lastUpdate = now;
+    this.lastUpdate = now;
+
     this.controls.update();
     this.update(delta/1000);
     // Render the scene
     this.renderer.render(this.scene, this.camera);
 }.bind(APP);
 
-APP.update = function(time) {
+APP.update = function(delta) {
     this.balls.forEach(element => {
-        let angle = this.amp * 0.0174533 * Math.cos((2*Math.PI)*(time/element.period));
-        element.mesh.rotation.z = angle;
+        // Yay for differential equations!
+        element.vel += (
+            -9.81 / element.length * Math.sin(element.thet) 
+            - 0.05 * element.vel
+            ) * delta;
+        element.thet += element.vel * delta;
+        element.mesh.rotation.z = element.thet;
     });
 }.bind(APP);
 
