@@ -1,7 +1,10 @@
 
 let APP = {
     amp: 30,
-    count: 50,
+    count: 20,
+
+    start_length: 0.9,
+    freq_step: 0.005,
 
     lengths:[],
     balls: []
@@ -14,9 +17,13 @@ $(document).ready(
 )
 
 APP.make_lengths = function(){
+
+    var start_freq = 1 / (2 * Math.PI * Math.sqrt(this.start_length / 9.81));
+
     for (let i = 0; i < this.count; i++) {
-        var period = 60/(52+i);
-        var len = (9.81 * Math.pow( period, 2)) / 39.4784176044;
+        var freq = start_freq + i * this.freq_step;
+        var len = (9.81 / (39.4784176044 * Math.pow(freq, 2) ) );
+        console.log(freq, len);
         this.lengths.push(len);
     }
 }
@@ -62,8 +69,6 @@ APP.init = function() {
         depth += 0.05;
     }
 
-    console.log(this.scene);
-
     this.scene.add(this.camera);
 
     APP.lastUpdate = Date.now();
@@ -93,6 +98,7 @@ APP.make_ball = function(l, z){
     mesh.add(ball);
     mesh.add(string);
 
+    //mesh.applyMatrix(new THREE.Matrix4().makeTranslation(0, l, z));
     mesh.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, z));
 
     this.balls.push({
