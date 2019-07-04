@@ -1,7 +1,10 @@
 
 let APP = {
     amp: 30,
-    count: 50,
+    count: 20,
+
+    start_length: 0.9,
+    freq_step: 0.005,
 
     lengths:[],
     balls: []
@@ -14,9 +17,13 @@ $(document).ready(
 )
 
 APP.make_lengths = function(){
+
+    var start_freq = 1 / (2 * Math.PI * Math.sqrt(this.start_length / 9.81));
+
     for (let i = 0; i < this.count; i++) {
-        var period = 60/(52+i);
-        var len = (9.81 * Math.pow( period, 2)) / 39.4784176044;
+        var freq = start_freq + i * this.freq_step;
+        var len = (9.81 / (39.4784176044 * Math.pow(freq, 2) ) );
+        console.log(freq, len);
         this.lengths.push(len);
     }
 }
@@ -46,9 +53,9 @@ APP.init = function() {
         2000
     );
     //this.camera.position.set(0, -0, -0.5);
-    this.camera.position.set(-0.14996288585180984, -0.0038989502922912866, -0.47859744166734935);
+    this.camera.position.set(-0.3431841681966547, 0.1820085204293208, -1.1600803696176978 );
     this.controls = new THREE.OrbitControls(this.camera, this.canvas);
-    this.controls.target.y = -0.2;
+    this.controls.target.y = -0.3;
     this.controls.update();
 
     // Make balls:
@@ -61,8 +68,6 @@ APP.init = function() {
         this.make_ball(length, depth);
         depth += 0.05;
     }
-
-    console.log(this.scene);
 
     this.scene.add(this.camera);
 
@@ -93,6 +98,7 @@ APP.make_ball = function(l, z){
     mesh.add(ball);
     mesh.add(string);
 
+    //mesh.applyMatrix(new THREE.Matrix4().makeTranslation(0, l, z));
     mesh.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, z));
 
     this.balls.push({
@@ -123,7 +129,7 @@ APP.update = function(delta) {
         // Yay for differential equations!
         element.vel += (
             -9.81 / element.length * Math.sin(element.thet) 
-            - 0.05 * element.vel
+            - 0.005 * element.vel
             ) * delta;
         element.thet += element.vel * delta;
         element.mesh.rotation.z = element.thet;
