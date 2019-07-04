@@ -53,9 +53,9 @@ APP.init = function() {
         2000
     );
     //this.camera.position.set(0, -0, -0.5);
-    this.camera.position.set(-0.14996288585180984, -0.0038989502922912866, -0.47859744166734935);
+    this.camera.position.set(-0.3431841681966547, 0.1820085204293208, -1.1600803696176978 );
     this.controls = new THREE.OrbitControls(this.camera, this.canvas);
-    this.controls.target.y = -0.2;
+    this.controls.target.y = -0.3;
     this.controls.update();
 
     // Make balls:
@@ -129,7 +129,7 @@ APP.update = function(delta) {
         // Yay for differential equations!
         element.vel += (
             -9.81 / element.length * Math.sin(element.thet) 
-            - 0.05 * element.vel
+            - 0.005 * element.vel
             ) * delta;
         element.thet += element.vel * delta;
         element.mesh.rotation.z = element.thet;
