@@ -12,3 +12,23 @@ body {
     height: 100vh;
     width: 100%;
 }
+
+@media all and (max-width: 481px) {
+    #controls {
+        display: none;
+    }
+}
+
+#controls {
+    font-size: 0.8em;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.37);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 140px;
+}
+
+#controls input {
+    width: 130px;
+}

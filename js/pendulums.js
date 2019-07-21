@@ -4,15 +4,42 @@ let APP = {
     count: 20,
 
     start_length: 0.9,
-    freq_step: 0.005,
+    freq_step: 1/90,
 
     lengths:[],
     balls: []
 };
 
+let query_params = {
+    amp: 'amp',
+    count: 'count',
+    start: 'start_length',
+    step: 'freq_step'
+}
+
+function parse_query(){
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    let data = {};
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        data[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+    }
+    return data;
+}
+
 $(document).ready(
     function(){
-        APP.init();
+        APP.init(parse_query());
+        $('#submit').click(() => {
+            let location = window.location.href.split('?')[0];
+            let params = {
+                amp: $("#amp").val(),
+                start: $("#maxlen").val()/100,
+                step: 1/($("#period").val())
+            };
+            window.location.replace(location + '?' + $.param(params));
+        });
     }
 )
 
@@ -20,6 +47,7 @@ APP.make_lengths = function(){
 
     var start_freq = 1 / (2 * Math.PI * Math.sqrt(this.start_length / 9.81));
 
+    console.log("FREQ (Hz), LENGTH(m)");
     for (let i = 0; i < this.count; i++) {
         var freq = start_freq + i * this.freq_step;
         var len = (9.81 / (39.4784176044 * Math.pow(freq, 2) ) );
@@ -28,7 +56,15 @@ APP.make_lengths = function(){
     }
 }
 
-APP.init = function() {
+APP.init = function(data) {
+
+    for (const key in data) {
+        if (data.hasOwnProperty(key) && query_params.hasOwnProperty(key)) {
+            const element = data[key];
+            this[query_params[key]] = element;
+        }
+    }
+
     this.make_lengths();
 
     this.canvas = document.getElementById("webglcanvas");
